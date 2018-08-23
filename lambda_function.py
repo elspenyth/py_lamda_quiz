@@ -73,6 +73,8 @@ def on_intent(intent_request, session):
         return get_help(intent, session)
     elif intent_name == "AMAZON.RepeatIntent":
         return repeat_question(intent, session)
+    elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
+        return handle_session_end_request()
     else:
         raise ValueError("Invalid intent")
 
@@ -144,7 +146,7 @@ def answer_question(intent, session):
     """ Person answers the question and it's tested here and a new question is asked
     """
 
-    card_title = intent['name']
+    card_title = intent['Question']
     session_attributes = {
         'score': session['attributes'].get('score', 0),
         'total_questions': session['attributes'].get('total_questions', 0)
@@ -174,6 +176,13 @@ def answer_question(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+def handle_session_end_request():
+    card_title = "Session Ended"
+    speech_output = "Thank you for playing Flag Master! Come back soon! "
+    # Setting this to true ends the session and exits the skill.
+    should_end_session = True
+    return build_response({}, build_speechlet_response(
+        card_title, speech_output, None, should_end_session))
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -186,8 +195,8 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'card': {
             'type': 'Simple',
-            'title': 'SessionSpeechlet - ' + title,
-            'content': 'SessionSpeechlet - ' + output
+            'title': title,
+            'content': output
         },
         'reprompt': {
             'outputSpeech': {
