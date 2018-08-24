@@ -146,7 +146,7 @@ def answer_question(intent, session):
     """ Person answers the question and it's tested here and a new question is asked
     """
 
-    card_title = intent['Question']
+    card_title = intent['name']
     session_attributes = {
         'score': session['attributes'].get('score', 0),
         'total_questions': session['attributes'].get('total_questions', 0)
